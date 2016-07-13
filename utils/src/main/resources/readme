@@ -1,0 +1,13 @@
+此工程为常用的工具功能实现类
+源码编码格式为: UTF-8
+
+字符串工具类: StringUtil
+	nvl(String str, String replace_with) 若str为NULL或空(空格),则用replace_with替换
+	strToNum(String str) 将字符串str转换为数字类型,如果字符串非数字类型,则返回整数0
+	isDecimal(String str) 判断字符串是否为小数
+	isInteger(String str) 判断字符串是否为整数
+	judgeStrByRegex(String str, String regex) 判断str是否匹配正则表达式regex
+	isNullStr(String str) 判断此字符串str是否为null字符串,忽略大小写
+	isNullOrEmpty(String str) 判断此字符串str是否为NULL或空（空格）
+	toString(Object obj) 当obj为null时，返回空格
+	extractNumFromStr(String str) 从str字符串中提取出所有数字
