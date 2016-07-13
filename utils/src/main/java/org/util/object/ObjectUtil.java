@@ -1,5 +1,10 @@
 package org.util.object;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * 对象工具类
@@ -7,7 +12,77 @@ package org.util.object;
  *
  */
 public final class ObjectUtil {
-
+	
+	/**
+	 * 获得对象Obj类Class所有注解annotation所有的值
+	 * @param field
+	 * @return [ {annotationSimpleName:{annotationMethodName:annotationMethodValue} }]
+	 */
+	public static HashMap<String, HashMap<String, Object>> getAnnotationValue(Class clasz){
+		if(null == clasz) return null;
+		Class<? extends Annotation> annotationType = null;
+		Annotation[] annotations = clasz.getDeclaredAnnotations();
+		HashMap<String, Object> annotationValue = null;
+		HashMap<String, HashMap<String, Object>> tAnnotationValue = new HashMap<String, HashMap<String,Object>>();
+		try {
+			for(Annotation annotation : annotations){
+				annotationValue = getAnnotationValue(annotation);
+				annotationType = annotation.annotationType();
+				tAnnotationValue.put(annotationType.getSimpleName(), annotationValue);
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} 
+		return tAnnotationValue;
+	}
+	
+	/**
+	 * 获得当前字段所有注解annotation所有的值
+	 * @param field
+	 * @return [ {annotationSimpleName:{annotationMethodName:annotationMethodValue} }]
+	 */
+	public static HashMap<String, HashMap<String, Object>> getAnnotationValue(Field field){
+		if(null == field) return null;
+		Class<? extends Annotation> annotationType = null;
+		Annotation[] annotations = field.getDeclaredAnnotations();
+		HashMap<String, Object> annotationValue = null;
+		HashMap<String, HashMap<String, Object>> fieldAnnotationValue = new HashMap<String, HashMap<String,Object>>();
+		try {
+			for(Annotation annotation : annotations){
+				annotationValue = getAnnotationValue(annotation);
+				annotationType = annotation.annotationType();
+				fieldAnnotationValue.put(annotationType.getSimpleName(), annotationValue);
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} 
+		return fieldAnnotationValue;
+	}
+	
+	/**
+	 * 获得注解annotation的所有字段值
+	 * @param annotation
+	 * @return
+	 */
+	public static HashMap<String, Object> getAnnotationValue(Annotation annotation){
+		if(null == annotation) return null;
+		HashMap<String, Object> annotationValue = new HashMap<String, Object>();
+		Class<? extends Annotation> annotationType = annotation.annotationType();
+		Method[] methods = annotationType.getDeclaredMethods();
+		try {
+			for(Method method : methods){
+				annotationValue.put(method.getName(), method.invoke(annotation));
+			}
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return annotationValue;
+	}
+	
 	/**
 	 * 判断此对象是否为<code>NULL</code>值
 	 * @param object
