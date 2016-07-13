@@ -134,4 +134,47 @@ public final class StrUtil {
 		return numStrList.toArray(new String[]{});
 	}
 	
+	/**
+	 * 将str转换为json
+	 * @param str
+	 * @return
+	 */
+	public static String string2Json(String str) { 
+	    StringBuilder sb = new StringBuilder(str.length()+20); 
+	    sb.append('\"'); 
+	    for (int i=0; i<str.length(); i++) { 
+	        char c = str.charAt(i); 
+	        switch (c) { 
+	        case '\"': 
+	            sb.append("\\\""); 
+	            break; 
+	        case '\\': 
+	            sb.append("\\\\"); 
+	            break; 
+	        case '/': 
+	            sb.append("\\/"); 
+	            break; 
+	        case '\b': 
+	            sb.append("\\b"); 
+	            break; 
+	        case '\f': 
+	            sb.append("\\f"); 
+	            break; 
+	        case '\n': 
+	            sb.append("\\n"); 
+	            break; 
+	        case '\r': 
+	            sb.append("\\r"); 
+	            break; 
+	        case '\t': 
+	            sb.append("\\t"); 
+	            break; 
+	        default: 
+	            sb.append(c); 
+	        } 
+	    } 
+	    sb.append('\"'); 
+	    return sb.toString(); 
+	 } 
+	
 }
