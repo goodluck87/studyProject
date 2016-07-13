@@ -8,6 +8,11 @@ import org.junit.Test;
 public class StrUtilTest {
 
 	@Test
+	public void testString2Json(){
+		System.out.println(StrUtil.string2Json("{user: l/uy, n\\ame: 'key'}"));;
+	}
+	
+	@Test
 	public void testReg(){
 		String regex = "[^\\|]+";
 		CharSequence input = "a|b|c|d|ee|f|g|1|2|3|4|5|6|ee|8|9|||ewq||||";
