@@ -3,6 +3,7 @@ package org.util.object;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,7 +38,7 @@ public final class ObjectUtil {
 	 */
 	public static boolean isPrimitive(String classType){
 		if(StrUtil.isNullOrEmpty(classType)) return false;
-		int index = classType.lastIndexOf(".");
+		int index = classType.lastIndexOf(".") + 1;
 		String className = index<0 ? classType.trim() : classType.substring(index).trim();
 		if("int".equals(className) || "java.lang.Integer".endsWith(className) ||
 		   "short".equals(className) || "java.lang.Short".endsWith(className) ||
@@ -51,6 +52,48 @@ public final class ObjectUtil {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * 将对象obj转换为基本数据类型
+	 * @param obj 一般为字符串
+	 * @param clasz
+	 * @return
+	 */
+	public static <T>T objToPrimitive(Object obj, Class clasz){
+		String className = clasz.getName();
+		return objToPrimitive(obj, className);
+	}
+	
+	/**
+	 * 将对象obj转换为基本数据类型
+	 * @param obj 一般为字符串
+	 * @param classType
+	 * @return
+	 */
+	public static <T>T objToPrimitive(Object obj, String classType){
+		if(StrUtil.isNullOrEmpty(classType)) return null;
+		int index = classType.lastIndexOf(".") + 1;
+		String className = index<0 ? classType.trim() : classType.substring(index).trim();
+		if("int".equals(className) || "java.lang.Integer".endsWith(className)){
+			return (T) Integer.valueOf(obj.toString());
+		}else if("short".equals(className) || "java.lang.Short".endsWith(className)){
+			return (T) Short.valueOf(obj.toString());
+		}else if("long".equals(className) || "java.lang.Long".endsWith(className)){
+			return (T) Long.valueOf(obj.toString());
+		}else if("byte".equals(className) || "java.lang.Byte".endsWith(className)){
+			return (T) Byte.valueOf(obj.toString());
+		}else if("float".equals(className) || "java.lang.Float".endsWith(className)){
+			return (T) Float.valueOf(obj.toString());
+		}else if("double".equals(className) || "java.lang.Double".endsWith(className)){
+			return (T) Double.valueOf(obj.toString());
+		}else if("char".equals(className) || "java.lang.Character".endsWith(className) ){
+			return (T) obj;
+		}else if("boolean".equals(className) || "java.lang.Boolean".endsWith(className)){
+			return (T) Boolean.valueOf(obj.toString());
+		}else{
+			return (T)obj.toString();
+		}
 	}
 	
 	/**

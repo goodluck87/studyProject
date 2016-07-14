@@ -13,13 +13,62 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.util.object.ObjectUtil;
 import org.util.str.StrUtil;
 
 public class XmlUtil {
-private static final String ENCODING = "UTF-8";
+	private static final String ENCODING = "UTF-8";
+
+	/**
+	 * @param xml
+	 * @param root
+	 * @param clasz
+	 * @return
+	 */
+	public static <T>T transXmlToObj(String xml, String root, Class clasz){
+		if(StrUtil.isNullOrEmpty(xml))return null;
+		Document doc = null;
+		try {
+			doc = DocumentHelper.parseText(xml);
+			return transDocToObj(doc, root, clasz);
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static <T>T transDocToObj(Document doc, String root, Class clasz){
+		if(null == doc) return null;
+		Object obj = null;
+		Object value = null;
+		String xPath = null;
+		Node node = null;
+		try {
+			obj = clasz.newInstance();
+			xPath = StrUtil.toString(root) + "/" + clasz.getSimpleName();
+			Field[] fields = clasz.getDeclaredFields();
+			for(Field field : fields){
+				if(!ObjectUtil.isPrimitive(field.getType().getName())){//åˆ¤æ–­æˆå‘˜å±æ€§æ˜¯å¦ä¸ºåŸºç¡€æ•°æ®ç±»å‹
+					value = transDocToObj(doc, xPath, field.getType());
+					ObjectUtil.setObjFieldValueByFieldName2(obj, field.getName(), value);
+				}else{
+					node = doc.selectSingleNode(xPath + "/" + field.getName());
+					if(null != node){
+						value = node.getText();
+						ObjectUtil.setObjFieldValueByFieldName2(obj, field.getName(), ObjectUtil.objToPrimitive(value, field.getType()));
+					}
+				}
+			}
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return (T)obj;
+	}
 	
 	public static String formatXml(String xml){
 		if(StrUtil.isNullOrEmpty(xml))return xml;
@@ -51,6 +100,11 @@ private static final String ENCODING = "UTF-8";
 			}
 		}
 		return formatXml;
+	}
+	
+	public static void saveObjToFile(Object obj,Class<?> clasz, String path){
+		String objXml = transObjToXml(obj, clasz);
+		saveXml(objXml, path);
 	}
 	
 	public static void saveXml(String xml, String path){
@@ -91,9 +145,9 @@ private static final String ENCODING = "UTF-8";
 	}
 	
 	/**
-	 * ¶ÔÏó×ª»»ÎªXML
-	 * @param obj
-	 * @param clasz
+	 * å¯¹è±¡è½¬æ¢ä¸ºXML
+	 * @param obj è¦è½¬æ¢çš„å¯¹è±¡(å¯ä¸ºNULL)
+	 * @param clasz objçš„class
 	 * @return
 	 */
 	public static String transObjToXml(Object obj, Class<?> clasz){
@@ -109,10 +163,18 @@ private static final String ENCODING = "UTF-8";
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		String xml = doc.selectSingleNode("/" + rootNode + "/" + obj.getClass().getSimpleName()).asXML();
+		String xml = doc.selectSingleNode("/" + rootNode + "/" + clasz.getSimpleName()).asXML();
 		return formatXml(xml);
 	}
 	
+	/**
+	 * @param element
+	 * @param obj è¦è½¬æ¢çš„å¯¹è±¡(å¯ä¸ºNULL)
+	 * @param clasz objçš„class
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
 	private static void transObjToDoc(Element element, Class<?> clasz, Object obj) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
 		Element tmp = null;
 		Object value = null;
@@ -122,14 +184,14 @@ private static final String ENCODING = "UTF-8";
 		
 		Field[] fields = clasz.getDeclaredFields();
 		for(Field field : fields){
-			if(!ObjectUtil.isPrimitive(field.getType().getName())){//ÅĞ¶Ï³ÉÔ±ÊôĞÔÊÇ·ñÎª»ù´¡Êı¾İÀàĞÍ
-				//ÊôĞÔÎª¶ÔÏóÊ±,»ñÈ¡µ±Ç°ÊôĞÔµÄvalue
+			if(!ObjectUtil.isPrimitive(field.getType().getName())){//åˆ¤æ–­æˆå‘˜å±æ€§æ˜¯å¦ä¸ºåŸºç¡€æ•°æ®ç±»å‹
+				//å±æ€§ä¸ºå¯¹è±¡æ—¶,è·å–å½“å‰å±æ€§çš„value
 				if(null != obj){
 					value = ObjectUtil.getObjFieldValueByFieldName2(obj, field.getName());
 				}
-				//µ±Ç°ÊôĞÔ²»Îª¿ÕÖµ,½øĞĞ×ª»»xml,·ñÔò×ª»»µ½´ËÎªÖ¹
+				//å½“å‰å±æ€§ä¸ä¸ºç©ºå€¼,è¿›è¡Œè½¬æ¢xml,å¦åˆ™è½¬æ¢åˆ°æ­¤ä¸ºæ­¢
 				if(null != value){
-					transObjToDoc(element, Class.forName(field.getType().getName()), value);
+					transObjToDoc(element, field.getType(), value);
 				}else{
 					element.addElement(field.getType().getSimpleName());
 				}
