@@ -15,6 +15,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.util.object.ObjectUtil;
 import org.util.str.StrUtil;
@@ -40,6 +41,19 @@ public class XmlUtil {
 		return null;
 	}
 	
+	public static <T>T parseXmlFileToObject(File file, Class clasz){
+		if(null == file || file.isDirectory()) return null;
+		SAXReader reader = new SAXReader();
+		Document doc = null;
+		try {
+			doc = reader.read(file);
+			return transDocToObj(doc, "", clasz);
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public static <T>T transDocToObj(Document doc, String root, Class clasz){
 		if(null == doc) return null;
 		Object obj = null;
@@ -49,13 +63,16 @@ public class XmlUtil {
 		try {
 			obj = clasz.newInstance();
 			xPath = StrUtil.toString(root) + "/" + clasz.getSimpleName();
+			
+			xPath = xPath.toLowerCase();
+			
 			Field[] fields = clasz.getDeclaredFields();
 			for(Field field : fields){
 				if(!ObjectUtil.isPrimitive(field.getType().getName())){//判断成员属性是否为基础数据类型
 					value = transDocToObj(doc, xPath, field.getType());
 					ObjectUtil.setObjFieldValueByFieldName2(obj, field.getName(), value);
 				}else{
-					node = doc.selectSingleNode(xPath + "/" + field.getName());
+					node = doc.selectSingleNode(xPath + "/" + field.getName().toLowerCase());
 					if(null != node){
 						value = node.getText();
 						ObjectUtil.setObjFieldValueByFieldName2(obj, field.getName(), ObjectUtil.objToPrimitive(value, field.getType()));
@@ -163,7 +180,7 @@ public class XmlUtil {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		String xml = doc.selectSingleNode("/" + rootNode + "/" + clasz.getSimpleName()).asXML();
+		String xml = doc.selectSingleNode("/" + rootNode + "/" + clasz.getSimpleName().toLowerCase()).asXML();
 		return formatXml(xml);
 	}
 	
@@ -179,7 +196,7 @@ public class XmlUtil {
 		Element tmp = null;
 		Object value = null;
 		
-		String eleName = clasz.getSimpleName();
+		String eleName = clasz.getSimpleName().toLowerCase();
 		element = element.addElement(eleName);
 		
 		Field[] fields = clasz.getDeclaredFields();
@@ -193,15 +210,14 @@ public class XmlUtil {
 				if(null != value){
 					transObjToDoc(element, field.getType(), value);
 				}else{
-					element.addElement(field.getType().getSimpleName());
+					element.addElement(field.getType().getSimpleName().toLowerCase());
 				}
 			}else{
-				tmp = element.addElement(field.getName());
+				tmp = element.addElement(field.getName().toLowerCase());
 				if(null != obj){
 					tmp.setText(StrUtil.toString(ObjectUtil.getObjFieldValueByFieldName2(obj, field.getName())));
 				}
 			}
-			
 		}
 	}
 }
