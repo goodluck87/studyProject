@@ -93,7 +93,7 @@ public final class StrUtil {
 	 * @return 字符串为<code>null</code>字符串时,返回<code>true</code><BR>
 	 */
 	public static boolean isNullStr(String str){
-		return isNullOrEmpty(str) ? false : "null".equalsIgnoreCase(str.trim());
+		return isNullOrEmpty(str) ? true : "null".equalsIgnoreCase(str.trim());
 	}
 
 	/**

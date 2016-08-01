@@ -76,17 +76,17 @@ public final class ObjectUtil {
 		int index = classType.lastIndexOf(".") + 1;
 		String className = index<0 ? classType.trim() : classType.substring(index).trim();
 		if("int".equals(className) || "java.lang.Integer".endsWith(className)){
-			return (T) Integer.valueOf(obj.toString());
+			return (T) Integer.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("short".equals(className) || "java.lang.Short".endsWith(className)){
-			return (T) Short.valueOf(obj.toString());
+			return (T) Short.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("long".equals(className) || "java.lang.Long".endsWith(className)){
-			return (T) Long.valueOf(obj.toString());
+			return (T) Long.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("byte".equals(className) || "java.lang.Byte".endsWith(className)){
-			return (T) Byte.valueOf(obj.toString());
+			return (T) Byte.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("float".equals(className) || "java.lang.Float".endsWith(className)){
-			return (T) Float.valueOf(obj.toString());
+			return (T) Float.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("double".equals(className) || "java.lang.Double".endsWith(className)){
-			return (T) Double.valueOf(obj.toString());
+			return (T) Double.valueOf(StrUtil.strToNum(obj.toString()).toString());
 		}else if("char".equals(className) || "java.lang.Character".endsWith(className) ){
 			return (T) obj;
 		}else if("boolean".equals(className) || "java.lang.Boolean".endsWith(className)){
