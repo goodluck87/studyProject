@@ -1,5 +1,7 @@
 package com.commons.xmlUtil;
 
+import java.io.File;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -42,8 +44,10 @@ public class TestXmlUtil {
 	
 	@Test
 	public void testGetXmlNode() throws DocumentException{
-		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Connection> <name>mysql.yhact</name>  <server>127.0.0.1</server>  <type/>  <access>Native</access>  <database>world</database>  <port>3306</port>  <username>admin</username>  <password>admin</password>  <servername/>  <data_tablespace/>  <index_tablespace/>  <Node/></Connection>";
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><connection> <name>mysql.yhact</name>  <server>127.0.0.1</server>  <type/>  <access>native</access>  <database>world</database>  <port>3306</port>  <username>admin</username>  <password>admin</password>  <servername/>  <data_tablespace/>  <node/></connection>";
 		Document doc = DocumentHelper.parseText(xml);
-		System.out.println(doc.selectSingleNode("//Connection/Node"));
+		System.out.println(doc.selectSingleNode("//connection/node").getText());
+		Connection conn = XmlUtil.transXmlToObj(xml, "", Connection.class);
+		System.out.println(conn.getDatabase());
 	}
 }
